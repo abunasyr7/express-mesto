@@ -16,6 +16,9 @@ app.use((req, res, next) => {
 app.use('/', express.json());
 app.use('/', usersRoute);
 app.use('/', cardRoute);
+app.use((req, res) => {
+  res.status(404).send({ message: 'Error 404' });
+});
 
 app.listen(3000, () => {
   console.log('Server has been started');
