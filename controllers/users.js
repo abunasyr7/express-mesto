@@ -22,9 +22,9 @@ const getUserId = (req, res) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Некорректные данные' });
-      } if (err.statusCode === 404) {
+      } if (err.status === 404) {
         return res.status(404).send({ message: err.message });
       }
       return res.status(500).send({ message: `Произошла ошибка: ${err.message}` });
@@ -61,7 +61,7 @@ const userInfo = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Некорректные данные' });
-      } if (err.name === 'CastError') {
+      } if (err.status === 404) {
         return res.status(404).send({ message: 'Невалидный id' });
       }
       return res.status(500).send({ message: 'Произошла ошибка' });
@@ -83,7 +83,7 @@ const avatarUpdate = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Некорректные данные' });
-      } if (err.name === 'CastError') {
+      } if (err.status === 404) {
         return res.status(404).send({ message: 'Невалидный id' });
       }
       return res.status(500).send({ message: 'Произошла ошибка' });
