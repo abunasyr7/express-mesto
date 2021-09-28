@@ -1,3 +1,6 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
@@ -32,11 +35,25 @@ const getUserId = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  console.log({ name, about, avatar });
-  User.create({ name, about, avatar })
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => {
-      res.send(user);
+      res.send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -90,6 +107,22 @@ const avatarUpdate = (req, res) => {
     });
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
 module.exports = {
-  getUsers, getUserId, createUser, userInfo, avatarUpdate,
+  getUsers, getUserId, createUser, userInfo, avatarUpdate, login,
 };
