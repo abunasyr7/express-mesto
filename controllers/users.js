@@ -34,7 +34,7 @@ const getUserId = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Неккоректный запрос'));
       }
-      if (err.statusCode === 404) {
+      if (err.status === 404) {
         next(new NotFoundError('id не найден'));
       }
       next(new ServerError('Ошибка на сервере'));
@@ -77,7 +77,7 @@ const userInfo = (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .orFail(new NotFoundError('NotFound'))
+    .orFail(new NotFoundError('Пользователь с таким id не найден'))
     .then((user) => {
       res.status(200).send(user);
     })
@@ -95,7 +95,7 @@ const avatarUpdate = (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .orFail(new NotFoundError())
+    .orFail(new NotFoundError('Пользователь с таким id не найден'))
     .then((user) => {
       res.status(200).send(user);
     })
