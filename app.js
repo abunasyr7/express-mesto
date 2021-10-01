@@ -33,9 +33,9 @@ app.post('/signin', celebrate({
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required.min(4),
-    name: Joi.string().required().min(3).max(15),
-    about: Joi.string().required().min(3).max(15),
+    password: Joi.string().required().min(4),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
     avatar: Joi.string().regex(/^(https?:\/\/)?([\da-z\\.-]+)\.([a-z\\.]{2,6})([/\w \\.-]*)*\/?$/),
   }),
 }), createUser);
@@ -43,7 +43,7 @@ app.post('/signup', celebrate({
 app.use(auth);
 app.use('/', usersRoute);
 app.use('/', cardRoute);
-app.call('*', (req, res, next) => {
+app.use('*', (req, res, next) => {
   next(new NotFoundError('Not Found'));
 });
 

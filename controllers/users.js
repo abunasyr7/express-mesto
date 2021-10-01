@@ -34,7 +34,7 @@ const getUserId = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Неккоректный запрос'));
       }
-      if (err.message === 'NotFound') {
+      if (err.statusCode === 404) {
         next(new NotFoundError('id не найден'));
       }
       next(new ServerError('Ошибка на сервере'));
@@ -65,7 +65,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Неккоректные данные'));
-      } else if (err.name === 'MongoError' && err.code === 11000) {
+      } else if (err.name === 'MongoServerError' && err.code === 11000) {
         next(new ConflictError('Указанный пользователь уже зарегестрирован'));
       } else {
         next(new ServerError('Произошла ошибка'));
@@ -84,7 +84,7 @@ const userInfo = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Неккоректные данные'));
-      } if (err.status === 404) {
+      } if (err.statusCode === 404) {
         next(new NotFoundError('Пользователь не найден'));
       }
       next(new ServerError('Ошибка на сервере'));
@@ -115,7 +115,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', 'super-strong-secret',
+        NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret',
         { expiresIn: '7d' },
       );
       res.send({ token });
